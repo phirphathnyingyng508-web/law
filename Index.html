@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <!-- นำเข้าฟอนต์ Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* --- 🎨 โครงสร้างพื้นฐานและพื้นหลัง --- */
+      body { font-family: 'Prompt', sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); margin: 0; padding: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: #333; }
+      
+      /* การ์ดแอปพลิเคชัน พร้อมเอฟเฟกต์ Fade-in */
+      .app-card { background: rgba(255, 255, 255, 0.98); width: 100%; max-width: 700px; padding: 40px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); box-sizing: border-box; margin: 20px; animation: fadeIn 0.6s ease-out; position: relative; overflow: hidden; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      
+      /* --- 🌟 หน้าแรก (Welcome Screen) --- */
+      #welcome-screen { display: block; text-align: center; }
+      .welcome-icon { font-size: 80px; margin-bottom: 10px; animation: bounce 2s infinite ease-in-out; }
+      @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+      .welcome-title { color: #1a2a6c; font-size: 42px; font-weight: 700; margin: 0 0 10px 0; letter-spacing: -1px; }
+      .welcome-subtitle { color: #555; font-size: 20px; margin-bottom: 30px; font-weight: 400; }
+      
+      /* กล่องคู่มือการใช้งาน */
+      .instruction-box { background: #f8faff; border: 2px solid #e1e9ff; border-radius: 20px; padding: 25px; text-align: left; margin-bottom: 35px; box-shadow: inset 0 0 15px rgba(0,0,0,0.02); }
+      .instruction-title { color: #1a73e8; font-size: 22px; font-weight: 700; margin-top: 0; margin-bottom: 20px; text-align: center; border-bottom: 2px dashed #c8d9f9; padding-bottom: 15px; }
+      .step-item { display: flex; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: 0.3s; }
+      .step-item:hover { transform: translateX(5px); box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
+      .step-icon { background: linear-gradient(135deg, #1a73e8, #1557b0); color: white; min-width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: 700; margin-right: 15px; box-shadow: 0 4px 10px rgba(26,115,232,0.3); }
+      .step-text { font-size: 18px; color: #444; line-height: 1.5; }
+      
+      /* ปุ่มเริ่มต้นใช้งาน (ดึงดูดสายตา) */
+      .btn-start { width: 100%; background: linear-gradient(to right, #fdbb2d, #b21f1f); color: white; border: none; padding: 22px; border-radius: 16px; font-size: 28px; font-weight: 700; font-family: 'Prompt', sans-serif; cursor: pointer; box-shadow: 0 8px 20px rgba(178,31,31,0.4); transition: all 0.3s; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+      .btn-start:hover { transform: scale(1.02); box-shadow: 0 10px 25px rgba(178,31,31,0.5); }
+
+      /* --- 📝 ระบบฟอร์ม และหน้าจออื่นๆ --- */
+      #main-screen, #history-screen { display: none; }
+      .header-logo { text-align: left; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;}
+      .header-logo h1 { color: #1a2a6c; margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.5px;}
+      
+      .input-group { margin-bottom: 25px; }
+      .input-group label { display: block; font-weight: 600; margin-bottom: 10px; color: #444; font-size: 18px; }
+      .input-group input, select, textarea { width: 100%; padding: 18px; border: 2px solid #ddd; border-radius: 12px; font-family: 'Prompt', sans-serif; font-size: 18px; box-sizing: border-box; resize: vertical; transition: 0.3s; background: #fdfdfd;}
+      .input-group input:focus, select:focus, textarea:focus { border-color: #1a73e8; background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(26,115,232,0.2);}
+      
+      /* --- 🖱️ ระบบปุ่มกด --- */
+      .btn-primary { width: 100%; background: linear-gradient(to right, #1a2a6c, #1557b0); color: white; border: none; padding: 20px; border-radius: 15px; font-size: 24px; font-weight: 700; font-family: 'Prompt', sans-serif; cursor: pointer; box-shadow: 0 6px 15px rgba(26,115,232,0.3); transition: all 0.2s; }
+      .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(26,115,232,0.4); }
+      .btn-clear { width: 100%; background: #f1f3f4; color: #555; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: 600; font-family: 'Prompt', sans-serif; cursor: pointer; margin-top: 15px; transition: 0.2s;}
+      .btn-clear:hover { background: #e0e0e0; color: #222;}
+      
+      .top-buttons { display: flex; justify-content: space-between; margin-bottom: 20px; }
+      .btn-nav { background: #e8f0fe; color: #1a73e8; border: none; font-weight: 600; font-size: 16px; cursor: pointer; font-family: 'Prompt', sans-serif; padding: 12px 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s;}
+      .btn-nav:hover { background: #d2e3fc; transform: translateY(-2px);}
+      
+      /* --- ⚠️ แจ้งเตือนและโหลด --- */
+      .warning-box { background-color: #fff3cd; color: #856404; padding: 18px; border-radius: 12px; font-size: 16px; margin-bottom: 25px; border-left: 6px solid #ffc107; line-height: 1.6; }
+      #loading { text-align: center; margin-top: 30px; font-weight: 600; font-size: 20px; color: #1a2a6c; display: none; }
+      .spinner { border: 5px solid #f3f3f3; border-top: 5px solid #1a2a6c; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      
+      /* --- 📊 กล่องแสดงผล --- */
+      #result-box { margin-top: 35px; padding: 30px; background-color: #f8faff; border: 2px solid #d0deff; border-radius: 15px; display: none; }
+      .result-header { display: flex; flex-direction: column; gap: 15px; border-bottom: 2px solid #d0deff; padding-bottom: 20px; margin-bottom: 25px; }
+      .result-title { color: #1a2a6c; font-weight: 700; font-size: 28px; margin: 0; text-align: center; }
+      .action-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+      .btn-action { color: white; border: none; padding: 12px 22px; border-radius: 30px; font-size: 18px; font-family: 'Prompt', sans-serif; cursor: pointer; font-weight: 600; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
+      .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+      .btn-speak { background: #28a745; } .btn-stop { background: #dc3545; } 
+      .btn-copy { background: #1a73e8; } .btn-print { background: #6c757d; }
+      .result-content { font-size: 22px; line-height: 1.8; color: #222; white-space: pre-line; }
+      
+      /* --- 🍞 ระบบ Toast Notification --- */
+      #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 30px; padding: 16px 24px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 18px; font-family: 'Prompt', sans-serif; font-weight: 500; box-shadow: 0 10px 20px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+      #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+
+      /* --- 🕰️ หน้าประวัติ --- */
+      .history-item { background: #fff; padding: 22px; border-radius: 12px; margin-bottom: 18px; border-left: 6px solid #1a73e8; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; }
+      .history-item:hover { background: #f8f9fa; transform: translateX(8px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); border-left-color: #1557b0;}
+      .history-category { font-size: 18px; color: #1a2a6c; font-weight: 700; margin-bottom: 8px; }
+      .history-date { font-size: 16px; color: #d32f2f; font-weight: 600; margin-bottom: 10px; }
+      .history-preview { font-size: 16px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .btn-clear-history { width: 100%; background: #ffebee; color: #c62828; border: 2px solid #ef9a9a; padding: 18px; border-radius: 12px; font-family: 'Prompt', sans-serif; font-size: 20px; font-weight: 700; margin-top: 30px; cursor: pointer; transition: 0.2s;}
+      .btn-clear-history:hover { background: #ffcdd2; transform: scale(0.98);}
+      .filter-box { background: #e8f0fe; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #c8d9f9;}
+      
+      /* --- 🖨️ โหมดการพิมพ์เอกสาร --- */
+      @media print {
+        body { background: #fff; padding: 0; margin: 0; }
+        .app-card { box-shadow: none; padding: 0; margin: 0; max-width: 100%; border: none; animation: none;}
+        .top-buttons, .warning-box, .input-group, .btn-primary, .btn-clear, .action-buttons, #welcome-screen { display: none !important; }
+        #result-box { border: none; background: #fff; padding: 0; margin-top: 0; display: block !important; }
+        .result-title { text-align: left; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .result-content { font-size: 16pt; color: #000; line-height: 1.5; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- ========================================== -->
+    <!-- 🌟 หน้าที่ 1: หน้าต้อนรับและคู่มือ (Welcome Screen) -->
+    <!-- ========================================== -->
+    <div id="welcome-screen" class="app-card">
+      <div class="welcome-header">
+        <div class="welcome-icon">⚖️</div>
+        <h1 class="welcome-title">ทนายชาวบ้าน AI</h1>
+        <div class="welcome-subtitle">วุ้นแปลภาษากฎหมาย สู่ภาษาชาวบ้าน เข้าใจง่ายใน 1 นาที</div>
+      </div>
+
+      <div class="instruction-box">
+        <h3 class="instruction-title">💡 วิธีใช้งานง่ายๆ ใน 3 ขั้นตอน</h3>
+        
+        <div class="step-item">
+          <div class="step-icon">1</div>
+          <div class="step-text"><b>เลือกประเภทเอกสาร</b><br><span style="font-size:15px; color:#666;">ระบุว่าเอกสารของคุณคืออะไร เช่น สัญญากู้ยืมเงิน, พินัยกรรม</span></div>
+        </div>
+        
+        <div class="step-item">
+          <div class="step-icon">2</div>
+          <div class="step-text"><b>วางข้อความที่สงสัย</b><br><span style="font-size:15px; color:#666;">คัดลอกเนื้อหาในสัญญาที่อ่านแล้วไม่เข้าใจ มาวางในกล่องข้อความ</span></div>
+        </div>
+        
+        <div class="step-item">
+          <div class="step-icon">3</div>
+          <div class="step-text"><b>กดปุ่มวิเคราะห์ข้อมูล</b><br><span style="font-size:15px; color:#666;">ทนาย AI จะช่วยฟันธง สรุปผล และอ่านออกเสียงให้ฟังทันที!</span></div>
+        </div>
+      </div>
+
+      <button class="btn-start" onclick="showMainScreen()">เริ่มต้นใช้งาน 🚀</button>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 📝 หน้าที่ 2: หน้าหลักสำหรับถาม-ตอบ (Main Screen) -->
+    <!-- ========================================== -->
+    <div id="main-screen" class="app-card">
+      <div class="top-buttons">
+        <button class="btn-nav" onclick="showWelcomeScreen()">🏠 หน้าแรก</button>
+        <button class="btn-nav" onclick="showHistoryScreen()">🕰️ ประวัติการค้นหา</button>
+      </div>
+      
+      <div class="header-logo">
+        <h1>⚖️ ทนายชาวบ้าน AI</h1>
+      </div>
+      
+      <div class="warning-box">
+        🔒 <b>เพื่อความปลอดภัยของข้อมูล:</b><br>กรุณาลบ ชื่อ-นามสกุล หรือ เลขบัตรประชาชน ของท่านออกก่อนกดวิเคราะห์ทุกครั้ง
+      </div>
+      
+      <div class="input-group">
+        <label>📄 1. เลือกประเภทเอกสาร:</label>
+        <select id="docType">
+          <option value="สัญญากู้ยืมเงิน">สัญญากู้ยืมเงิน (ใน/นอกระบบ)</option>
+          <option value="สัญญาเช่า/ซื้อขาย">สัญญาเช่า / ซื้อขาย</option>
+          <option value="สัญญาประกันชีวิต">สัญญาประกันชีวิต / สุขภาพ</option>
+          <option value="เอกสารมรดก">เอกสารมรดก / พินัยกรรม</option>
+          <option value="ใบแจ้งหนี้">ใบแจ้งหนี้ / สัญญาบัตรเครดิต</option>
+          <option value="เอกสารราชการ">เอกสารราชการ (ที่ดิน, ทะเบียนบ้าน)</option>
+        </select>
+      </div>
+      
+      <div class="input-group">
+        <label>✍️ 2. วางข้อความกฎหมายที่สงสัย:</label>
+        <textarea id="inputText" rows="6" placeholder="วางข้อความสัญญาสุดโหด ที่นี่..."></textarea>
+      </div>
+      
+      <button id="submitBtn" class="btn-primary" onclick="sendData()">วิเคราะห์ข้อมูล 🚀</button>
+      <button id="clearBtn" class="btn-clear" onclick="clearInput()">🗑️ ล้างข้อความ</button>
+      
+      <div id="loading">
+        <div class="spinner"></div>
+        ทนาย AI กำลังวิเคราะห์ข้อกฎหมายอย่างละเอียด...
+      </div>
+      
+      <div id="result-box"></div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 🕰️ หน้าที่ 3: หน้าประวัติ (History Screen) -->
+    <!-- ========================================== -->
+    <div id="history-screen" class="app-card">
+      <div class="top-buttons">
+        <button class="btn-nav" onclick="showMainScreen()">⬅️ กลับหน้าหลัก</button>
+      </div>
+      
+      <div class="header-logo" style="margin-bottom: 25px;">
+        <h2 style="color: #1a2a6c; margin: 0; font-size: 32px;">🕰️ ประวัติของคุณ</h2>
+      </div>
+      
+      <div class="input-group filter-box">
+        <label>🔎 เลือกหมวดหมู่ที่ต้องการดู:</label>
+        <select id="historyFilter" onchange="filterHistory()">
+          <option value="ทั้งหมด">📁 ดูทั้งหมดทุกประเภท</option>
+          <option value="สัญญากู้ยืมเงิน">สัญญากู้ยืมเงิน (ใน/นอกระบบ)</option>
+          <option value="สัญญาเช่า/ซื้อขาย">สัญญาเช่า / ซื้อขาย</option>
+          <option value="สัญญาประกันชีวิต">สัญญาประกันชีวิต/สุขภาพ</option>
+          <option value="เอกสารมรดก">เอกสารมรดก/พินัยกรรม</option>
+          <option value="ใบแจ้งหนี้">ใบแจ้งหนี้/สัญญาบัตรเครดิต</option>
+          <option value="เอกสารราชการ">เอกสารราชการ (ที่ดิน, ทะเบียนบ้าน)</option>
+        </select>
+      </div>
+      
+      <div id="history-list-container"></div>
+      <button class="btn-clear-history" onclick="clearHistory()">🗑️ ล้างประวัติทั้งหมด (กู้คืนไม่ได้)</button>
+    </div>
+
+    <!-- Toast Notification แจ้งเตือนแบบล้ำๆ -->
+    <div id="toast">📋 คัดลอกสำเร็จ!</div>
+
+    <!-- ========================================== -->
+    <!-- Javascript สำหรับควบคุมการทำงานหน้าเว็บ -->
+    <!-- ========================================== -->
+    <script>
+      let currentAiText = ""; 
+
+      // --- ระบบนำทาง (Navigation) ---
+      function showWelcomeScreen() {
+        stopSpeech();
+        document.getElementById('main-screen').style.display = 'none';
+        document.getElementById('history-screen').style.display = 'none';
+        document.getElementById('welcome-screen').style.display = 'block';
+      }
+
+      function showMainScreen() {
+        stopSpeech();
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('history-screen').style.display = 'none';
+        document.getElementById('main-screen').style.display = 'block';
+      }
+
+      function showHistoryScreen() {
+        stopSpeech(); 
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-screen').style.display = 'none';
+        document.getElementById('history-screen').style.display = 'block';
+        document.getElementById('historyFilter').value = 'ทั้งหมด';
+        filterHistory(); 
+      }
+
+      function clearInput() {
+        document.getElementById('inputText').value = '';
+        document.getElementById('result-box').style.display = 'none';
+      }
+
+      // --- ระบบเสียงพูด ---
+      function speakText() {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel(); 
+          const msg = new SpeechSynthesisUtterance();
+          let cleanTextForSpeech = currentAiText.replace(/\*/g, '').replace(/⚖️|📝|✅|❌|🚨|📖/g, ''); 
+          msg.text = cleanTextForSpeech;
+          msg.lang = 'th-TH'; 
+          msg.rate = 0.85; 
+          
+          let voices = window.speechSynthesis.getVoices();
+          let thaiVoice = voices.find(v => v.lang === 'th-TH');
+          if(thaiVoice) msg.voice = thaiVoice;
+
+          window.speechSynthesis.speak(msg);
+        } else {
+          alert("อุปกรณ์ของคุณไม่รองรับระบบเสียงครับ");
+        }
+      }
+
+      function stopSpeech() {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+      }
+
+      // --- ระบบอำนวยความสะดวก ---
+      function copyText() {
+        let cleanText = currentAiText.replace(/\*\*/g, ''); 
+        navigator.clipboard.writeText(cleanText).then(function() {
+          showToast("📋 คัดลอกข้อความสำเร็จ!");
+        }).catch(function(err) {
+          showToast("❌ ไม่สามารถคัดลอกได้");
+        });
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.innerHTML = message;
+        toast.className = "show";
+        setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+      }
+
+      function printDocument() {
+        window.print();
+      }
+
+      // --- ระบบวิเคราะห์และเชื่อมต่อ AI ---
+      function sendData() {
+        const docType = document.getElementById('docType').value;
+        const text = document.getElementById('inputText').value;
+        
+        if(!text.trim()) { 
+          showToast("⚠️ กรุณาวางข้อความก่อนครับ"); 
+          return; 
+        }
+
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('clearBtn').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('result-box').style.display = 'none';
+        
+        stopSpeech(); 
+
+        google.script.run
+          .withSuccessHandler(function(result) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('clearBtn').style.display = 'block';
+            
+            if (result.includes("[ERROR_NOT_LEGAL]")) {
+              showError("ข้อความไม่สอดคล้องกับเอกสารทางกฎหมาย <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาตรวจสอบว่าข้อความที่นำมาใส่ เป็นเอกสารหรือข้อกฎหมายจริง ไม่ใช่การพูดคุยทั่วไป)</span>");
+            } 
+            else if (result.includes("[ERROR_MISMATCH]")) {
+              showError("ตรวจสอบหมวดหมู่เอกสารให้ถูกต้อง <br><br><span style='font-size:16px; color:#c62828;'>(พบว่าข้อความที่ใส่เข้ามา ไม่ตรงกับ 'ประเภท' ที่เลือกด้านบน เพื่อการวิเคราะห์ที่แม่นยำ กรุณาเลือกประเภทให้ตรงกันครับ)</span>");
+            } 
+            else if (result.includes("[ERROR_API_DOWN]")) {
+              showError("ระบบตรวจสอบความปลอดภัยขัดข้องชั่วคราว <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาลองกดวิเคราะห์ใหม่อีกครั้ง)</span>");
+            }
+            else {
+              showResult(result);
+              saveHistory(docType, result);
+            }
+          })
+          .withFailureHandler(function(error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('clearBtn').style.display = 'block';
+            showError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย<br><br><span style='font-size:14px; color:#c62828;'>(" + error.message + ")</span>");
+          })
+          .analyzeDocument(docType, text);
+      }
+
+      function showError(errorMessage) {
+        const errorHtml = `
+          <div style="background-color: #ffebee; border: 2px solid #ef9a9a; padding: 30px; border-radius: 15px; text-align: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
+            <div style="font-size: 55px; margin-bottom: 15px; animation: bounce 1s infinite alternate;">⚠️</div>
+            <h3 style="color: #b71c1c; margin-top: 0; margin-bottom: 15px; font-size: 28px;">ตรวจพบความผิดปกติ</h3>
+            <div style="font-size: 20px; color: #b71c1c; font-weight: 500; line-height: 1.6;">${errorMessage}</div>
+          </div>
+        `;
+        document.getElementById('result-box').innerHTML = errorHtml;
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+      }
+
+      function showResult(resultText) {
+        currentAiText = resultText;
+        let formattedHtml = resultText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        
+        const finalHtml = `
+          <div class="result-header">
+            <div class="result-title">⚖️ ผลการวิเคราะห์กฎหมาย</div>
+            <div class="action-buttons">
+              <button class="btn-action btn-speak" onclick="speakText()">🔊 ฟังเสียง</button>
+              <button class="btn-action btn-stop" onclick="stopSpeech()">⏹️ หยุดฟัง</button>
+              <button class="btn-action btn-copy" onclick="copyText()">📋 คัดลอก</button>
+              <button class="btn-action btn-print" onclick="printDocument()">🖨️ พิมพ์</button>
+            </div>
+          </div>
+          <div class="result-content">${formattedHtml}</div>
+        `;
+        
+        document.getElementById('result-box').innerHTML = finalHtml;
+        document.getElementById('result-box').style.display = 'block';
+        document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
+      }
+
+      // --- ระบบประวัติ ---
+      function saveHistory(docType, resultText) {
+        let history = JSON.parse(localStorage.getItem('lawyerAiHistory')) || [];
+        const newItem = { docType: docType, result: resultText, date: new Date().toLocaleString('th-TH') };
+        history.unshift(newItem); 
+        if(history.length > 30) history.pop(); 
+        localStorage.setItem('lawyerAiHistory', JSON.stringify(history));
+      }
+
+      function filterHistory() {
+        const filterValue = document.getElementById('historyFilter').value;
+        let history = JSON.parse(localStorage.getItem('lawyerAiHistory')) || [];
+        const container = document.getElementById('history-list-container');
+        container.innerHTML = ''; 
+        
+        if(history.length === 0) {
+          container.innerHTML = '<p style="color:#666; text-align:center; font-size:18px; margin-top:30px;">ยังไม่มีประวัติการใช้งานครับ</p>'; return;
+        }
+        
+        let filteredHistory = history;
+        if (filterValue !== 'ทั้งหมด') {
+          filteredHistory = history.filter(item => item.docType === filterValue);
+        }
+        
+        if(filteredHistory.length === 0) {
+          container.innerHTML = '<p style="color:#666; text-align:center; font-size:18px; margin-top:30px;">ยังไม่มีข้อมูลในหมวดหมู่นี้</p>'; return;
+        }
+        
+        filteredHistory.forEach(item => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'history-item';
+          let previewText = item.result.substring(0, 80).replace(/\*/g, '').replace(/⚖️|📝|✅|❌|🚨|📖/g, '') + '...'; 
+          
+          itemDiv.innerHTML = `
+            <div class="history-category">📑 หมวดหมู่: ${item.docType}</div>
+            <div class="history-date">🕒 เวลา: ${item.date}</div>
+            <div class="history-preview">📝 ข้อสรุป: ${previewText}</div>
+          `;
+          
+          itemDiv.onclick = function() {
+            document.getElementById('docType').value = item.docType; 
+            showMainScreen(); 
+            showResult(item.result);
+          };
+          container.appendChild(itemDiv);
+        });
+      }
+
+      function clearHistory() {
+        if(confirm('ยืนยันการลบประวัติทั้งหมดหรือไม่? (ข้อมูลไม่สามารถกู้คืนได้)')) {
+          localStorage.removeItem('lawyerAiHistory'); 
+          filterHistory(); 
+          showToast("🗑️ ล้างประวัติสำเร็จ");
+        }
+      }
+    </script>
+  </body>
+</html>
