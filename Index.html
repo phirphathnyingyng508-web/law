@@ -309,6 +309,7 @@
         // ส่งข้อมูลข้ามโดเมนด้วย fetch API
         fetch(googleWebAppUrl, {
             method: "POST",
+            redirect: "follow",
             body: JSON.stringify({
                 docType: docType,
                 text: text
