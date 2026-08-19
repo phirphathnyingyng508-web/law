@@ -1,21 +1,36 @@
 // =========================================================================
-// ⚖️ ทนายชาวบ้าน AI (Elderly-Friendly Legal Assistant)
+// ⚖️ ทนายชาวบ้าน AI (Elderly-Friendly Legal Assistant) - Backend API
 // =========================================================================
 
-const API_KEY = "XlsPD6JNJpArGLwlroRnqoL2zLeZcIod"; // <--- อย่าลืมใส่ API Key นะครับ
+const API_KEY = "XlsPD6JNJpArGLwlroRnqoL2zLeZcIod"; 
+const API_URL = "http://thaillm.or.th/api/v1/chat/completions"; 
 
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index')
-      .setTitle('⚖️ ทนายชาวบ้าน AI')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1'); 
+// API Gateway รับค่าจาก Fetch API (index.html)
+function doPost(e) {
+  try {
+    const contents = JSON.parse(e.postData.contents);
+    const docType = contents.docType;
+    const text = contents.text;
+
+    const result = analyzeDocument(docType, text);
+
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "success",
+      "result": result
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "error",
+      "message": err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
+// 🧠 ประมวลผลร่วมกับ ThaiLLM API
 function analyzeDocument(docType, text) {
-  const url = "http://thaillm.or.th/api/v1/chat/completions";
   
-  // =========================================================================
-  // 🛡️ Agent 1: "ด่านตรวจ" (คัดกรองหมวดหมู่)
-  // =========================================================================
+  // 🛡️ Guardrail Agent
   const guardPrompt = `คุณคือระบบรักษาความปลอดภัย (Logic Gate)
 หน้าที่ของคุณคือตรวจสอบข้อความว่า "เกี่ยวข้อง" กับหมวดหมู่: "${docType}" หรือไม่
 คุณต้องตอบกลับด้วยคำศัพท์ในวงเล็บก้ามปูเท่านั้น ห้ามอธิบาย!
@@ -30,8 +45,12 @@ function analyzeDocument(docType, text) {
 ข้อความ: ผู้กู้ตกลงกู้ยืมเงิน 50,000 บาท ดอกร้อยละ 15 ต่อปี
 คำตอบ: [PASS]
 
-ประเภท: สัญญากู้ยืมเงิน
-ข้อความ: กู้ 100,000 ดอก 5% ต่อเดือน ไม่จ่ายยึดทรัพย์ทันที
+ประเภท: สัญญาจ้างงาน
+ข้อความ: นายจ้างตกลงจ้างลูกจ้างทำงานตำแหน่งพนักงาน ค่าจ้างวันละ 400 บาท
+คำตอบ: [PASS]
+
+ประเภท: สัญญาจ้างงาน
+ข้อความ: ห้ามลูกจ้างลาออกเด็ดขาด หากลาออกต้องเสียค่าปรับ 1 แสนบาท
 คำตอบ: [PASS]
 
 ประเภท: สัญญากู้ยืมเงิน
@@ -54,7 +73,7 @@ function analyzeDocument(docType, text) {
   };
 
   try {
-    const responseGuard = UrlFetchApp.fetch(url, {
+    const responseGuard = UrlFetchApp.fetch(API_URL, {
       "method": "post",
       "contentType": "application/json",
       "headers": { "Authorization": "Bearer " + API_KEY },
@@ -83,19 +102,15 @@ function analyzeDocument(docType, text) {
     return "[ERROR_API_DOWN]";
   }
 
-  // =========================================================================
-  // 👨‍⚖️ Agent 2: "ทนายความ" (อัปเกรด: เพิ่มการอ้างอิงมาตรากฎหมายแบบเข้าใจง่าย)
-  // =========================================================================
+  // 👨‍⚖️ Lawyer Agent
   const lawyerPrompt = `คุณคือ 'ทนายชาวบ้าน AI' หน้าที่ของคุณคือแปลข้อความกฎหมายให้ 'ผู้สูงอายุ' ฟัง
 กฎเหล็ก: ต้องตอบให้ "สั้น กระชับ เข้าใจง่าย" ใช้ภาษาพูดเหมือนลูกหลานเล่าให้ฟัง บังคับตอบตาม 5 ข้อนี้เท่านั้น (ข้อละไม่เกิน 3-4 บรรทัด):
 
-1. ⚖️ ฟันธงความถูกต้อง: (บอกสั้นๆ ไปเลยว่า "✅ สัญญานี้ปลอดภัยทำได้" หรือ "🚨 สัญญานี้ผิดกฎหมาย/โดนเอาเปรียบ" เพราะอะไรสั้นๆ)
+1. ⚖️ สถานะความถูกต้อง: (ประเมินสั้นๆ ว่า "✅ สัญญานี้ปลอดภัยทำได้" หรือ "🚨 สัญญานี้ผิดกฎหมาย/โดนเอาเปรียบ" เพราะเหตุใด)
 2. 📝 สรุปง่ายๆ: (ใคร ต้องทำอะไร จ่ายเท่าไหร่ อธิบายแบบบ้านๆ)
 3. ✅ คำแนะนำ: (คุณตาคุณยายควรทำยังไงต่อไป เพื่อรักษาสิทธิของตนเอง)
 4. ❌ ห้ามทำเด็ดขาด: (เตือนสติ เช่น ห้ามเซ็น, ห้ามโอนเงินก่อน, ระวังโดนยึดทรัพย์)
-5. 📖 กฎหมายอ้างอิง: (ระบุ "ชื่อและมาตรากฎหมาย" ที่เกี่ยวข้อง และอธิบายความหมายของมาตรานั้นสั้นๆ ให้ชาวบ้านเข้าใจง่าย ว่ากฎหมายคุ้มครองเรื่องนี้อย่างไร)
-
-(ตัวอย่างข้อ 5: 📖 กฎหมายอ้างอิง: ตามประมวลกฎหมายแพ่งและพาณิชย์ มาตรา 654 ห้ามคิดดอกเบี้ยเกินร้อยละ 15 ต่อปี หากคิดเกินกว่านั้น ดอกเบี้ยจะเป็นโมฆะทั้งหมด คือไม่ต้องจ่ายดอกเบี้ยเลยแม้แต่บาทเดียวครับ)`;
+5. 📖 กฎหมายอ้างอิง: (ระบุ "ชื่อและมาตรากฎหมาย" ที่เกี่ยวข้อง และอธิบายความหมายของมาตรานั้นสั้นๆ ให้ชาวบ้านเข้าใจง่าย ว่ากฎหมายคุ้มครองเรื่องนี้อย่างไร)`;
 
   const lawyerPayload = {
     "model": "typhoon-s-thaillm-8b-instruct",
@@ -108,7 +123,7 @@ function analyzeDocument(docType, text) {
   };
 
   try {
-    const responseLawyer = UrlFetchApp.fetch(url, {
+    const responseLawyer = UrlFetchApp.fetch(API_URL, {
       "method": "post",
       "contentType": "application/json",
       "headers": { "Authorization": "Bearer " + API_KEY },
