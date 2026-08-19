@@ -27,10 +27,10 @@
       .step-icon { background: linear-gradient(135deg, #1a73e8, #1557b0); color: white; min-width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: 700; margin-right: 15px; box-shadow: 0 4px 10px rgba(26,115,232,0.3); }
       .step-text { font-size: 18px; color: #444; line-height: 1.5; }
       
-      /* ปุ่มเริ่มต้นใช้งาน */
+      /* ปุ่มเริ่มต้นใช้งาน (ดึงดูดสายตา) */
       .btn-start { width: 100%; background: linear-gradient(to right, #fdbb2d, #b21f1f); color: white; border: none; padding: 22px; border-radius: 16px; font-size: 28px; font-weight: 700; font-family: 'Prompt', sans-serif; cursor: pointer; box-shadow: 0 8px 20px rgba(178,31,31,0.4); transition: all 0.3s; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
       .btn-start:hover { transform: scale(1.02); box-shadow: 0 10px 25px rgba(178,31,31,0.5); }
- 
+
       /* --- 📝 ระบบฟอร์ม และหน้าจออื่นๆ --- */
       #main-screen, #history-screen { display: none; }
       .header-logo { text-align: left; margin-bottom: 25px; border-bottom: 2px solid #e0e0e0; padding-bottom: 15px;}
@@ -64,16 +64,14 @@
       .action-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
       .btn-action { color: white; border: none; padding: 12px 22px; border-radius: 30px; font-size: 18px; font-family: 'Prompt', sans-serif; cursor: pointer; font-weight: 600; transition: 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
       .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
-      .btn-speak { background: #28a745; }
-      .btn-stop { background: #dc3545; } 
-      .btn-copy { background: #1a73e8; }
-      .btn-print { background: #6c757d; }
+      .btn-speak { background: #28a745; } .btn-stop { background: #dc3545; } 
+      .btn-copy { background: #1a73e8; } .btn-print { background: #6c757d; }
       .result-content { font-size: 22px; line-height: 1.8; color: #222; white-space: pre-line; }
       
       /* --- 🍞 ระบบ Toast Notification --- */
       #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 30px; padding: 16px 24px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 18px; font-family: 'Prompt', sans-serif; font-weight: 500; box-shadow: 0 10px 20px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
       #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
- 
+
       /* --- 🕰️ หน้าประวัติ --- */
       .history-item { background: #fff; padding: 22px; border-radius: 12px; margin-bottom: 18px; border-left: 6px solid #1a73e8; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e0e0e0; }
       .history-item:hover { background: #f8f9fa; transform: translateX(8px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); border-left-color: #1557b0;}
@@ -97,42 +95,49 @@
   </head>
   <body>
 
-    <!-- 🌟 หน้าที่ 1: หน้าต้อนรับและคู่มือ -->
+    <!-- ========================================== -->
+    <!-- 🌟 หน้าที่ 1: หน้าต้อนรับและคู่มือ (Welcome Screen) -->
+    <!-- ========================================== -->
     <div id="welcome-screen" class="app-card">
       <div class="welcome-header">
         <div class="welcome-icon">⚖️</div>
         <h1 class="welcome-title">ทนายชาวบ้าน AI</h1>
         <div class="welcome-subtitle">วุ้นแปลภาษากฎหมาย สู่ภาษาชาวบ้าน เข้าใจง่ายใน 1 นาที</div>
       </div>
- 
+
       <div class="instruction-box">
         <h3 class="instruction-title">💡 วิธีใช้งานง่ายๆ ใน 3 ขั้นตอน</h3>
+        
         <div class="step-item">
           <div class="step-icon">1</div>
           <div class="step-text"><b>เลือกประเภทเอกสาร</b><br><span style="font-size:15px; color:#666;">ระบุว่าเอกสารของคุณคืออะไร เช่น สัญญากู้ยืมเงิน, พินัยกรรม</span></div>
         </div>
+        
         <div class="step-item">
           <div class="step-icon">2</div>
           <div class="step-text"><b>วางข้อความที่สงสัย</b><br><span style="font-size:15px; color:#666;">คัดลอกเนื้อหาในสัญญาที่อ่านแล้วไม่เข้าใจ มาวางในกล่องข้อความ</span></div>
         </div>
+        
         <div class="step-item">
           <div class="step-icon">3</div>
-          <div class="step-text"><b>กดปุ่มวิเคราะห์ข้อมูล</b><br><span style="font-size:15px; color:#666;">ทนาย AIจะช่วยฟันธง สรุปผล และอ่านออกเสียงให้ฟังทันที!</span></div>
+          <div class="step-text"><b>กดปุ่มวิเคราะห์ข้อมูล</b><br><span style="font-size:15px; color:#666;">ทนาย AI จะช่วยฟันธง สรุปผล และอ่านออกเสียงให้ฟังทันที!</span></div>
         </div>
       </div>
- 
+
       <button class="btn-start" onclick="showMainScreen()">เริ่มต้นใช้งาน 🚀</button>
     </div>
- 
-    <!-- 📝 หน้าที่ 2: หน้าหลักสำหรับถาม-ตอบ -->
+
+    <!-- ========================================== -->
+    <!-- 📝 หน้าที่ 2: หน้าหลักสำหรับถาม-ตอบ (Main Screen) -->
+    <!-- ========================================== -->
     <div id="main-screen" class="app-card">
       <div class="top-buttons">
         <button class="btn-nav" onclick="showWelcomeScreen()">🏠 หน้าแรก</button>
-        <button class="btn-nav" onclick="showHistoryScreen()">🕰️ประวัติการค้นหา</button>
+        <button class="btn-nav" onclick="showHistoryScreen()">🕰️ ประวัติการค้นหา</button>
       </div>
       
       <div class="header-logo">
-        <h1>⚖️ทนายชาวบ้าน AI</h1>
+        <h1>⚖️ ทนายชาวบ้าน AI</h1>
       </div>
       
       <div class="warning-box">
@@ -156,21 +161,23 @@
         <textarea id="inputText" rows="6" placeholder="วางข้อความสัญญาสุดโหด ที่นี่..."></textarea>
       </div>
       
-      <button id="submitBtn" class="btn-primary" onclick="sendData()">วิเคราะห์ข้อมูล🚀</button>
-      <button id="clearBtn" class="btn-clear" onclick="clearInput()">🗑️ล้างข้อความ</button>
+      <button id="submitBtn" class="btn-primary" onclick="sendData()">วิเคราะห์ข้อมูล 🚀</button>
+      <button id="clearBtn" class="btn-clear" onclick="clearInput()">🗑️ ล้างข้อความ</button>
       
       <div id="loading">
         <div class="spinner"></div>
-        ทนาย AIกำลังวิเคราะห์ข้อกฎหมายอย่างละเอียด...
+        ทนาย AI กำลังวิเคราะห์ข้อกฎหมายอย่างละเอียด...
       </div>
       
       <div id="result-box"></div>
     </div>
- 
-    <!-- 🕰️ หน้าที่ 3: หน้าประวัติ -->
+
+    <!-- ========================================== -->
+    <!-- 🕰️ หน้าที่ 3: หน้าประวัติ (History Screen) -->
+    <!-- ========================================== -->
     <div id="history-screen" class="app-card">
       <div class="top-buttons">
-        <button class="btn-nav" onclick="showMainScreen()">⬅️กลับหน้าหลัก</button>
+        <button class="btn-nav" onclick="showMainScreen()">⬅️ กลับหน้าหลัก</button>
       </div>
       
       <div class="header-logo" style="margin-bottom: 25px;">
@@ -178,9 +185,9 @@
       </div>
       
       <div class="input-group filter-box">
-        <label>🔎เลือกหมวดหมู่ที่ต้องการดู:</label>
+        <label>🔎 เลือกหมวดหมู่ที่ต้องการดู:</label>
         <select id="historyFilter" onchange="filterHistory()">
-          <option value="ทั้งหมด">📁ดูทั้งหมดทุกประเภท</option>
+          <option value="ทั้งหมด">📁 ดูทั้งหมดทุกประเภท</option>
           <option value="สัญญากู้ยืมเงิน">สัญญากู้ยืมเงิน (ใน/นอกระบบ)</option>
           <option value="สัญญาเช่า/ซื้อขาย">สัญญาเช่า / ซื้อขาย</option>
           <option value="สัญญาประกันชีวิต">สัญญาประกันชีวิต/สุขภาพ</option>
@@ -191,18 +198,18 @@
       </div>
       
       <div id="history-list-container"></div>
-      <button class="btn-clear-history" onclick="clearHistory()">🗑️ล้างประวัติทั้งหมด (กู้คืนไม่ได้)</button>
+      <button class="btn-clear-history" onclick="clearHistory()">🗑️ ล้างประวัติทั้งหมด (กู้คืนไม่ได้)</button>
     </div>
- 
-    <!-- Toast Notification -->
-    <div id="toast">📋คัดลอกสำเร็จ!</div>
 
+    <!-- Toast Notification แจ้งเตือนแบบล้ำๆ -->
+    <div id="toast">📋 คัดลอกสำเร็จ!</div>
+
+    <!-- ========================================== -->
+    <!-- Javascript สำหรับควบคุมการทำงานหน้าเว็บ -->
+    <!-- ========================================== -->
     <script>
-      // ⚠️ นำ Web App URL ที่ได้จาก Google Apps Script มาวางแทนที่ข้อความในเครื่องหมายอัญประกาศข้างล่างนี้
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzpfMkGmApEKDAc-li0G4JVr49nfdP9sDstbWzKqrwTDCaJDh3AjEoxis1ROA1tQNiU/exec"; 
-
       let currentAiText = ""; 
- 
+
       // --- ระบบนำทาง (Navigation) ---
       function showWelcomeScreen() {
         stopSpeech();
@@ -210,14 +217,14 @@
         document.getElementById('history-screen').style.display = 'none';
         document.getElementById('welcome-screen').style.display = 'block';
       }
- 
+
       function showMainScreen() {
         stopSpeech();
         document.getElementById('welcome-screen').style.display = 'none';
         document.getElementById('history-screen').style.display = 'none';
         document.getElementById('main-screen').style.display = 'block';
       }
- 
+
       function showHistoryScreen() {
         stopSpeech(); 
         document.getElementById('welcome-screen').style.display = 'none';
@@ -226,12 +233,12 @@
         document.getElementById('historyFilter').value = 'ทั้งหมด';
         filterHistory(); 
       }
- 
+
       function clearInput() {
         document.getElementById('inputText').value = '';
         document.getElementById('result-box').style.display = 'none';
       }
- 
+
       // --- ระบบเสียงพูด ---
       function speakText() {
         if ('speechSynthesis' in window) {
@@ -245,91 +252,86 @@
           let voices = window.speechSynthesis.getVoices();
           let thaiVoice = voices.find(v => v.lang === 'th-TH');
           if(thaiVoice) msg.voice = thaiVoice;
- 
+
           window.speechSynthesis.speak(msg);
         } else {
           alert("อุปกรณ์ของคุณไม่รองรับระบบเสียงครับ");
         }
       }
- 
+
       function stopSpeech() {
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
         }
       }
- 
+
       // --- ระบบอำนวยความสะดวก ---
       function copyText() {
         let cleanText = currentAiText.replace(/\*\*/g, ''); 
         navigator.clipboard.writeText(cleanText).then(function() {
-          showToast("📋คัดลอกข้อความสำเร็จ!");
+          showToast("📋 คัดลอกข้อความสำเร็จ!");
         }).catch(function(err) {
-          showToast("❌ไม่สามารถคัดลอกได้");
+          showToast("❌ ไม่สามารถคัดลอกได้");
         });
       }
- 
+
       function showToast(message) {
         const toast = document.getElementById("toast");
         toast.innerHTML = message;
         toast.className = "show";
         setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
       }
- 
+
       function printDocument() {
         window.print();
       }
- 
-      // --- ระบบวิเคราะห์และเชื่อมต่อ AI ผ่าน Fetch ---
+
+      // --- ระบบวิเคราะห์และเชื่อมต่อ AI ---
       function sendData() {
         const docType = document.getElementById('docType').value;
         const text = document.getElementById('inputText').value;
         
         if(!text.trim()) { 
-          showToast("⚠️กรุณาวางข้อความก่อนครับ"); 
+          showToast("⚠️ กรุณาวางข้อความก่อนครับ"); 
           return; 
         }
- 
+
         document.getElementById('submitBtn').style.display = 'none';
         document.getElementById('clearBtn').style.display = 'none';
         document.getElementById('loading').style.display = 'block';
         document.getElementById('result-box').style.display = 'none';
         
         stopSpeech(); 
- 
-        // ส่งข้อมูลไปยัง Google Apps Script
-        fetch(WEB_APP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ docType: docType, text: text })
-        })
-        .then(response => response.text())
-        .then(result => {
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('submitBtn').style.display = 'block';
-          document.getElementById('clearBtn').style.display = 'block';
-          
-          if (result.includes("[ERROR_NOT_LEGAL]")) {
-            showError("ข้อความไม่สอดคล้องกับเอกสารทางกฎหมาย <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาตรวจสอบว่าข้อความที่นำมาใส่ เป็นเอกสารหรือข้อกฎหมายจริง ไม่ใช่การพูดคุยทั่วไป)</span>");
-          } 
-          else if (result.includes("[ERROR_MISMATCH]")) {
-            showError("ตรวจสอบหมวดหมู่เอกสารให้ถูกต้อง <br><br><span style='font-size:16px; color:#c62828;'>(พบว่าข้อความที่ใส่เข้ามา ไม่ตรงกับ 'ประเภท' ที่เลือกด้านบน เพื่อการวิเคราะห์ที่แม่นยำ กรุณาเลือกประเภทให้ตรงกันครับ)</span>");
-          } 
-          else if (result.includes("[ERROR_API_DOWN]")) {
-            showError("ระบบตรวจสอบความปลอดภัยขัดข้องชั่วคราว <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาลองกดวิเคราะห์ใหม่อีกครั้ง)</span>");
-          }
-          else {
-            showResult(result);
-            saveHistory(docType, result);
-          }
-        })
-        .catch(error => {
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('submitBtn').style.display = 'block';
-          document.getElementById('clearBtn').style.display = 'block';
-          showError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย<br><br><span style='font-size:14px; color:#c62828;'>(" + error.message + ")</span>");
-        });
+
+        google.script.run
+          .withSuccessHandler(function(result) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('clearBtn').style.display = 'block';
+            
+            if (result.includes("[ERROR_NOT_LEGAL]")) {
+              showError("ข้อความไม่สอดคล้องกับเอกสารทางกฎหมาย <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาตรวจสอบว่าข้อความที่นำมาใส่ เป็นเอกสารหรือข้อกฎหมายจริง ไม่ใช่การพูดคุยทั่วไป)</span>");
+            } 
+            else if (result.includes("[ERROR_MISMATCH]")) {
+              showError("ตรวจสอบหมวดหมู่เอกสารให้ถูกต้อง <br><br><span style='font-size:16px; color:#c62828;'>(พบว่าข้อความที่ใส่เข้ามา ไม่ตรงกับ 'ประเภท' ที่เลือกด้านบน เพื่อการวิเคราะห์ที่แม่นยำ กรุณาเลือกประเภทให้ตรงกันครับ)</span>");
+            } 
+            else if (result.includes("[ERROR_API_DOWN]")) {
+              showError("ระบบตรวจสอบความปลอดภัยขัดข้องชั่วคราว <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาลองกดวิเคราะห์ใหม่อีกครั้ง)</span>");
+            }
+            else {
+              showResult(result);
+              saveHistory(docType, result);
+            }
+          })
+          .withFailureHandler(function(error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'block';
+            document.getElementById('clearBtn').style.display = 'block';
+            showError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย<br><br><span style='font-size:14px; color:#c62828;'>(" + error.message + ")</span>");
+          })
+          .analyzeDocument(docType, text);
       }
- 
+
       function showError(errorMessage) {
         const errorHtml = `
           <div style="background-color: #ffebee; border: 2px solid #ef9a9a; padding: 30px; border-radius: 15px; text-align: center; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
@@ -342,7 +344,7 @@
         document.getElementById('result-box').style.display = 'block';
         document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
       }
- 
+
       function showResult(resultText) {
         currentAiText = resultText;
         let formattedHtml = resultText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -351,10 +353,10 @@
           <div class="result-header">
             <div class="result-title">⚖️ ผลการวิเคราะห์กฎหมาย</div>
             <div class="action-buttons">
-              <button class="btn-action btn-speak" onclick="speakText()">🔊ฟังเสียง</button>
-              <button class="btn-action btn-stop" onclick="stopSpeech()">⏹️หยุดฟัง</button>
-              <button class="btn-action btn-copy" onclick="copyText()">📋คัดลอก</button>
-              <button class="btn-action btn-print" onclick="printDocument()">🖨️พิมพ์</button>
+              <button class="btn-action btn-speak" onclick="speakText()">🔊 ฟังเสียง</button>
+              <button class="btn-action btn-stop" onclick="stopSpeech()">⏹️ หยุดฟัง</button>
+              <button class="btn-action btn-copy" onclick="copyText()">📋 คัดลอก</button>
+              <button class="btn-action btn-print" onclick="printDocument()">🖨️ พิมพ์</button>
             </div>
           </div>
           <div class="result-content">${formattedHtml}</div>
@@ -364,7 +366,7 @@
         document.getElementById('result-box').style.display = 'block';
         document.getElementById('result-box').scrollIntoView({ behavior: 'smooth' });
       }
- 
+
       // --- ระบบประวัติ ---
       function saveHistory(docType, resultText) {
         let history = JSON.parse(localStorage.getItem('lawyerAiHistory')) || [];
@@ -373,7 +375,7 @@
         if(history.length > 30) history.pop(); 
         localStorage.setItem('lawyerAiHistory', JSON.stringify(history));
       }
- 
+
       function filterHistory() {
         const filterValue = document.getElementById('historyFilter').value;
         let history = JSON.parse(localStorage.getItem('lawyerAiHistory')) || [];
@@ -381,8 +383,7 @@
         container.innerHTML = ''; 
         
         if(history.length === 0) {
-          container.innerHTML = '<p style="color:#666; text-align:center; font-size:18px; margin-top:30px;">ยังไม่มีประวัติการใช้งานครับ</p>';
-          return;
+          container.innerHTML = '<p style="color:#666; text-align:center; font-size:18px; margin-top:30px;">ยังไม่มีประวัติการใช้งานครับ</p>'; return;
         }
         
         let filteredHistory = history;
@@ -391,8 +392,7 @@
         }
         
         if(filteredHistory.length === 0) {
-          container.innerHTML = '<p style="color:#666; text-align:center; font-size:18px; margin-top:30px;">ยังไม่มีข้อมูลในหมวดหมู่นี้</p>';
-          return;
+          container.innerHTML = '<p style="color:#666; text-align:center; font-size:18px; margin-top:30px;">ยังไม่มีข้อมูลในหมวดหมู่นี้</p>'; return;
         }
         
         filteredHistory.forEach(item => {
@@ -414,14 +414,15 @@
           container.appendChild(itemDiv);
         });
       }
- 
+
       function clearHistory() {
         if(confirm('ยืนยันการลบประวัติทั้งหมดหรือไม่? (ข้อมูลไม่สามารถกู้คืนได้)')) {
           localStorage.removeItem('lawyerAiHistory'); 
           filterHistory(); 
-          showToast("🗑️ล้างประวัติสำเร็จ");
+          showToast("🗑️ ล้างประวัติสำเร็จ");
         }
       }
     </script>
   </body>
 </html>
+
