@@ -292,7 +292,7 @@
         window.print();
       }
 
-      // --- ระบบวิเคราะห์และเชื่อมต่อ AI (แก้ไขให้ใช้ fetch) ---
+      // --- ระบบวิเคราะห์และเชื่อมต่อ AI (แก้ไขปรับปรุงแล้ว) ---
       function sendData() {
         const docType = document.getElementById('docType').value;
         const text = document.getElementById('inputText').value;
@@ -309,36 +309,54 @@
         
         stopSpeech(); 
 
+        // ⏱️ ตั้งเวลา Timeout 35 วินาที กันหมุนค้าง
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 35000);
+
         fetch(GAS_WEB_APP_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ docType: docType, text: text })
+          body: JSON.stringify({ docType: docType, text: text }),
+          signal: controller.signal
         })
-        .then(response => response.text())
-        .then(result => {
+        .then(response => response.json()) // แปลงเป็น JSON Object
+        .then(data => {
+          clearTimeout(timeoutId);
           document.getElementById('loading').style.display = 'none';
           document.getElementById('submitBtn').style.display = 'block';
           document.getElementById('clearBtn').style.display = 'block';
           
-          if (result.includes("[ERROR_NOT_LEGAL]")) {
-            showError("ข้อความไม่สอดคล้องกับเอกสารทางกฎหมาย <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาตรวจสอบว่าข้อความที่นำมาใส่ เป็นเอกสารหรือข้อกฎหมายจริง ไม่ใช่การพูดคุยทั่วไป)</span>");
-          } 
-          else if (result.includes("[ERROR_MISMATCH]")) {
-            showError("ตรวจสอบหมวดหมู่เอกสารให้ถูกต้อง <br><br><span style='font-size:16px; color:#c62828;'>(พบว่าข้อความที่ใส่เข้ามา ไม่ตรงกับ 'ประเภท' ที่เลือกด้านบน เพื่อการวิเคราะห์ที่แม่นยำ กรุณาเลือกประเภทให้ตรงกันครับ)</span>");
-          } 
-          else if (result.includes("[ERROR_API_DOWN]")) {
-            showError("ระบบตรวจสอบความปลอดภัยขัดข้องชั่วคราว <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาลองกดวิเคราะห์ใหม่อีกครั้ง)</span>");
-          }
-          else {
-            showResult(result);
-            saveHistory(docType, result);
+          if (data.status === "success") {
+            const result = data.result;
+
+            if (result.includes("[ERROR_NOT_LEGAL]")) {
+              showError("ข้อความไม่สอดคล้องกับเอกสารทางกฎหมาย <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาตรวจสอบว่าข้อความที่นำมาใส่ เป็นเอกสารหรือข้อกฎหมายจริง ไม่ใช่การพูดคุยทั่วไป)</span>");
+            } 
+            else if (result.includes("[ERROR_MISMATCH]")) {
+              showError("ตรวจสอบหมวดหมู่เอกสารให้ถูกต้อง <br><br><span style='font-size:16px; color:#c62828;'>(พบว่าข้อความที่ใส่เข้ามา ไม่ตรงกับ 'ประเภท' ที่เลือกด้านบน เพื่อการวิเคราะห์ที่แม่นยำ กรุณาเลือกประเภทให้ตรงกันครับ)</span>");
+            } 
+            else if (result.includes("[ERROR_API_DOWN]")) {
+              showError("ระบบตรวจสอบความปลอดภัยขัดข้องชั่วคราว <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาลองกดวิเคราะห์ใหม่อีกครั้ง)</span>");
+            }
+            else {
+              showResult(result);
+              saveHistory(docType, result);
+            }
+          } else {
+            showError("เกิดข้อผิดพลาดจากเซิร์ฟเวอร์: " + data.message);
           }
         })
         .catch(error => {
+          clearTimeout(timeoutId);
           document.getElementById('loading').style.display = 'none';
           document.getElementById('submitBtn').style.display = 'block';
           document.getElementById('clearBtn').style.display = 'block';
-          showError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย<br><br><span style='font-size:14px; color:#c62828;'>(" + error.message + ")</span>");
+
+          if (error.name === 'AbortError') {
+            showError("⚠️ เซิร์ฟเวอร์ใช้เวลาตอบนานเกินไป (ThaiLLM หน่วง)<br><br><span style='font-size:16px; color:#c62828;'>(กรุณากดปุ่มวิเคราะห์ใหม่อีกครั้งครับ)</span>");
+          } else {
+            showError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย<br><br><span style='font-size:14px; color:#c62828;'>(" + error.message + ")</span>");
+          }
         });
       }
 
