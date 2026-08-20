@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8"> <!-- 👈 เพิ่มบรรทัดนี้ลงไปด้านบนสุดของ head -->
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ผู้เชี่ยวชาญด้านกฎหมายผู้สูงอายุ</title>
     <base target="_top">
@@ -30,7 +30,7 @@
       .step-icon { background: linear-gradient(135deg, #1a73e8, #1557b0); color: white; min-width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: 700; margin-right: 15px; box-shadow: 0 4px 10px rgba(26,115,232,0.3); }
       .step-text { font-size: 18px; color: #444; line-height: 1.5; }
       
-      /* ปุ่มเริ่มต้นใช้งาน (ดึงดูดสายตา) */
+      /* ปุ่มเริ่มต้นใช้งาน */
       .btn-start { width: 100%; background: linear-gradient(to right, #fdbb2d, #b21f1f); color: white; border: none; padding: 22px; border-radius: 16px; font-size: 28px; font-weight: 700; font-family: 'Prompt', sans-serif; cursor: pointer; box-shadow: 0 8px 20px rgba(178,31,31,0.4); transition: all 0.3s; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
       .btn-start:hover { transform: scale(1.02); box-shadow: 0 10px 25px rgba(178,31,31,0.5); }
 
@@ -204,7 +204,7 @@
       <button class="btn-clear-history" onclick="clearHistory()">🗑️ ล้างประวัติทั้งหมด (กู้คืนไม่ได้)</button>
     </div>
 
-    <!-- Toast Notification แจ้งเตือนแบบล้ำๆ -->
+    <!-- Toast Notification -->
     <div id="toast">📋 คัดลอกสำเร็จ!</div>
 
     <!-- ========================================== -->
@@ -212,6 +212,9 @@
     <!-- ========================================== -->
     <script>
       let currentAiText = ""; 
+
+      // 🔗 ใส่ URL ของ Google Apps Script Web App ตรงนี้ (ต้องลงท้ายด้วย /exec)
+      const GAS_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID_HERE/exec";
 
       // --- ระบบนำทาง (Navigation) ---
       function showWelcomeScreen() {
@@ -289,7 +292,7 @@
         window.print();
       }
 
-      // --- ระบบวิเคราะห์และเชื่อมต่อ AI ---
+      // --- ระบบวิเคราะห์และเชื่อมต่อ AI (แก้ไขให้ใช้ fetch) ---
       function sendData() {
         const docType = document.getElementById('docType').value;
         const text = document.getElementById('inputText').value;
@@ -306,33 +309,37 @@
         
         stopSpeech(); 
 
-        google.script.run
-          .withSuccessHandler(function(result) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('submitBtn').style.display = 'block';
-            document.getElementById('clearBtn').style.display = 'block';
-            
-            if (result.includes("[ERROR_NOT_LEGAL]")) {
-              showError("ข้อความไม่สอดคล้องกับเอกสารทางกฎหมาย <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาตรวจสอบว่าข้อความที่นำมาใส่ เป็นเอกสารหรือข้อกฎหมายจริง ไม่ใช่การพูดคุยทั่วไป)</span>");
-            } 
-            else if (result.includes("[ERROR_MISMATCH]")) {
-              showError("ตรวจสอบหมวดหมู่เอกสารให้ถูกต้อง <br><br><span style='font-size:16px; color:#c62828;'>(พบว่าข้อความที่ใส่เข้ามา ไม่ตรงกับ 'ประเภท' ที่เลือกด้านบน เพื่อการวิเคราะห์ที่แม่นยำ กรุณาเลือกประเภทให้ตรงกันครับ)</span>");
-            } 
-            else if (result.includes("[ERROR_API_DOWN]")) {
-              showError("ระบบตรวจสอบความปลอดภัยขัดข้องชั่วคราว <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาลองกดวิเคราะห์ใหม่อีกครั้ง)</span>");
-            }
-            else {
-              showResult(result);
-              saveHistory(docType, result);
-            }
-          })
-          .withFailureHandler(function(error) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('submitBtn').style.display = 'block';
-            document.getElementById('clearBtn').style.display = 'block';
-            showError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย<br><br><span style='font-size:14px; color:#c62828;'>(" + error.message + ")</span>");
-          })
-          .analyzeDocument(docType, text);
+        fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ docType: docType, text: text })
+        })
+        .then(response => response.text())
+        .then(result => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('submitBtn').style.display = 'block';
+          document.getElementById('clearBtn').style.display = 'block';
+          
+          if (result.includes("[ERROR_NOT_LEGAL]")) {
+            showError("ข้อความไม่สอดคล้องกับเอกสารทางกฎหมาย <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาตรวจสอบว่าข้อความที่นำมาใส่ เป็นเอกสารหรือข้อกฎหมายจริง ไม่ใช่การพูดคุยทั่วไป)</span>");
+          } 
+          else if (result.includes("[ERROR_MISMATCH]")) {
+            showError("ตรวจสอบหมวดหมู่เอกสารให้ถูกต้อง <br><br><span style='font-size:16px; color:#c62828;'>(พบว่าข้อความที่ใส่เข้ามา ไม่ตรงกับ 'ประเภท' ที่เลือกด้านบน เพื่อการวิเคราะห์ที่แม่นยำ กรุณาเลือกประเภทให้ตรงกันครับ)</span>");
+          } 
+          else if (result.includes("[ERROR_API_DOWN]")) {
+            showError("ระบบตรวจสอบความปลอดภัยขัดข้องชั่วคราว <br><br><span style='font-size:16px; color:#c62828;'>(กรุณาลองกดวิเคราะห์ใหม่อีกครั้ง)</span>");
+          }
+          else {
+            showResult(result);
+            saveHistory(docType, result);
+          }
+        })
+        .catch(error => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('submitBtn').style.display = 'block';
+          document.getElementById('clearBtn').style.display = 'block';
+          showError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย<br><br><span style='font-size:14px; color:#c62828;'>(" + error.message + ")</span>");
+        });
       }
 
       function showError(errorMessage) {
@@ -428,4 +435,3 @@
     </script>
   </body>
 </html>
-
